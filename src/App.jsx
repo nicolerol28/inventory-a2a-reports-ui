@@ -2,10 +2,21 @@ import { useState, useEffect } from 'react'
 import { jwtDecode } from 'jwt-decode'
 import Login from './pages/Login.jsx'
 import Reports from './pages/Reports.jsx'
+import { useDarkMode } from './hooks/useDarkMode.js'
 
 export default function App() {
+  const { isDark, toggle } = useDarkMode();
   const [token, setToken] = useState(localStorage.getItem("token"));
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState(() => {
+    const t = localStorage.getItem("token");
+    if (!t) return null;
+    try {
+      const decoded = jwtDecode(t);
+      return decoded.exp * 1000 < Date.now() ? null : decoded;
+    } catch {
+      return null;
+    }
+  });
 
   useEffect(() => {
     if (token) {
@@ -37,5 +48,5 @@ export default function App() {
     return <Login onLogin={handleLogin} />;
   }
 
-  return <Reports user={user} onLogout={handleLogout} />;
+  return <Reports user={user} onLogout={handleLogout} isDark={isDark} onToggleDark={toggle} />;
 }

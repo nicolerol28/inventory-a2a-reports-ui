@@ -18,8 +18,12 @@ export default function Login({ onLogin }) {
         import.meta.env.VITE_DEMO_PASSWORD,
       );
       onLogin(data.token);
-    } catch {
-      setDemoError("Error al cargar el demo, intenta de nuevo");
+    } catch (err) {
+      if (err.code === 'ECONNABORTED' || !err.response) {
+        setDemoError("Sin conexión con el servidor. Intenta de nuevo.");
+      } else {
+        setDemoError("Error al cargar el demo. Intenta de nuevo.");
+      }
     } finally {
       setDemoLoading(false);
     }
@@ -33,15 +37,21 @@ export default function Login({ onLogin }) {
       const { loginRequest } = await import("../api/authClient.js");
       const data = await loginRequest(email, password);
       onLogin(data.token);
-    } catch {
-      setError("Credenciales incorrectas. Intenta de nuevo.");
+    } catch (err) {
+      if (err.code === 'ECONNABORTED') {
+        setError("El servidor tardó demasiado. Intenta de nuevo.");
+      } else if (!err.response) {
+        setError("Sin conexión. Verifica tu red e intenta de nuevo.");
+      } else {
+        setError("Credenciales incorrectas. Intenta de nuevo.");
+      }
     } finally {
       setLoading(false);
     }
   }
 
   return (
-    <div className="min-h-screen flex">
+    <div className="min-h-screen flex transition-colors duration-300">
 
       {/* Lado izquierdo */}
       <div className="hidden lg:flex w-[54%] bg-[#1E3A5F] flex-col justify-between p-14 relative overflow-hidden">
@@ -96,7 +106,7 @@ export default function Login({ onLogin }) {
       </div>
 
       {/* Lado derecho */}
-      <div className="flex-1 flex items-center justify-center px-8" style={{ backgroundColor: "#F8FAFC" }}>
+      <div className="flex-1 flex items-center justify-center px-8 bg-[#F8FAFC] dark:bg-gray-950 transition-colors duration-300">
         <div className="w-full max-w-sm">
 
           {/* Logo movil */}
@@ -104,55 +114,57 @@ export default function Login({ onLogin }) {
             <div className="w-8 h-8 rounded-lg flex items-center justify-center">
               <img src="/favicon.svg" alt="logo" className="w-8 h-8" />
             </div>
-            <span className="text-gray-900 font-bold text-sm">Inventory AI</span>
+            <span className="text-gray-900 dark:text-white font-bold text-sm">Inventory AI</span>
           </div>
 
-          <h2 className="text-2xl font-semibold mb-1" style={{ color: "#0F172A" }}>
+          <h2 className="text-2xl font-semibold mb-1 text-[#0F172A] dark:text-white">
             Reportes de inventario
           </h2>
-          <p className="text-sm text-gray-400 mb-8">
+          <p className="text-sm text-gray-400 dark:text-gray-500 mb-8">
             Ingresa tus credenciales para generar reportes
           </p>
 
           {/* Formulario */}
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
             <div>
-              <label htmlFor="login-email" className="block text-xs font-medium text-gray-500 mb-1.5">
+              <label htmlFor="login-email" className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1.5">
                 Correo electronico
               </label>
               <input
                 id="login-email"
                 type="email"
+                autoComplete="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="admin@inventario.com"
                 required
-                className="w-full px-3 py-2.5 rounded-lg text-sm border border-gray-200 bg-white text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
+                className="w-full px-3 py-2.5 rounded-lg text-sm border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
               />
             </div>
 
             <div>
-              <label htmlFor="login-password" className="block text-xs font-medium text-gray-500 mb-1.5">
+              <label htmlFor="login-password" className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1.5">
                 Contrasena
               </label>
               <input
                 id="login-password"
                 type="password"
+                autoComplete="current-password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
                 required
-                className="w-full px-3 py-2.5 rounded-lg text-sm border border-gray-200 bg-white text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
+                className="w-full px-3 py-2.5 rounded-lg text-sm border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
               />
             </div>
 
             {error && (
-              <p className="text-xs text-red-500">{error}</p>
+              <p role="alert" className="text-xs text-red-500 dark:text-red-400">{error}</p>
             )}
 
             <button
               type="submit"
-              disabled={loading}
+              disabled={loading || demoLoading}
               className="w-full py-2.5 rounded-lg text-sm font-medium bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 transition-colors"
             >
               {loading ? "Ingresando..." : "Ingresar"}
@@ -161,26 +173,26 @@ export default function Login({ onLogin }) {
 
           {/* Separador */}
           <div className="flex items-center gap-3 my-5">
-            <div className="flex-1 h-px bg-gray-200"/>
-            <span className="text-xs text-gray-400">o</span>
-            <div className="flex-1 h-px bg-gray-200"/>
+            <div className="flex-1 h-px bg-gray-200 dark:bg-gray-700"/>
+            <span className="text-xs text-gray-400 dark:text-gray-500">o</span>
+            <div className="flex-1 h-px bg-gray-200 dark:bg-gray-700"/>
           </div>
 
           {/* Boton demo */}
           <button
             type="button"
             onClick={handleDemo}
-            disabled={demoLoading}
-            className="w-full px-4 py-2.5 rounded-lg text-sm font-medium border border-blue-600 text-blue-600 hover:bg-blue-50 disabled:opacity-50 transition-colors"
+            disabled={demoLoading || loading}
+            className="w-full px-4 py-2.5 rounded-lg text-sm font-medium border border-blue-600 dark:border-blue-500 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 disabled:opacity-50 transition-colors"
           >
             {demoLoading ? "Cargando demo..." : "Probar demo"}
           </button>
           {demoError && (
-            <p className="text-xs text-red-500 mt-1.5">{demoError}</p>
+            <p role="alert" className="text-xs text-red-500 dark:text-red-400 mt-1.5">{demoError}</p>
           )}
 
           {/* Footer */}
-          <p className="text-center text-xs text-gray-400 mt-10">
+          <p className="text-center text-xs text-gray-400 dark:text-gray-500 mt-10">
             Reportes ejecutivos potenciados por IA
           </p>
         </div>
