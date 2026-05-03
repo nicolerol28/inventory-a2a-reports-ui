@@ -6,6 +6,8 @@ React UI for the Inventory Reports Agent. Generates executive inventory reports 
 
 > Demo credentials — click **"Probar demo"** on the login page for instant access with pre-seeded data.
 
+>  **Note:** This is a portfolio project. Live demos may be unavailable as services are scaled to zero to manage hosting costs.
+
 ![Reports UI](public/reports-ui.png)
 
 ---
