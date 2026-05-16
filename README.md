@@ -6,8 +6,6 @@ React UI for the Inventory Reports Agent. Generates executive inventory reports 
 
 > Demo credentials — click **"Probar demo"** on the login page for instant access with pre-seeded data.
 
->  **Note:** This is a portfolio project. Live demos may be unavailable as services are scaled to zero to manage hosting costs.
-
 ![Reports UI](public/reports-ui.png)
 
 ---
@@ -87,9 +85,9 @@ This project is one of six repositories in the Inventory AI system:
 inventory-system-frontend      React dashboard           (Vercel)
 inventory-ai-chat              Chat UI                   (Vercel)
 inventory-a2a-reports-ui       This repo · Reports UI    (Vercel)
-inventory-a2a-reports          Reports Agent · Mastra    (Railway)
-inventory-ai-service           Inventory Agent · Mastra  (Railway)
-inventory-system-backend       Java 17 + Spring Boot     (Railway)
+inventory-a2a-reports          Reports Agent · Mastra    (Self-hosted)
+inventory-ai-service           Inventory Agent · Mastra  (Self-hosted)
+inventory-system-backend       Java 17 + Spring Boot     (Self-hosted)
 ```
 
 ---
